@@ -15,6 +15,7 @@ class App extends React.Component {
       this.state = {
         longitude: "",
         latitude: "",
+        moonInfo : "",
         responseFlag : false,
         input_option : 0
         };
@@ -22,9 +23,11 @@ class App extends React.Component {
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
       this.handleOptionChange = this.handleOptionChange.bind(this);
+      this.gpsDidMount = this.gpsDidMount.bind(this);
     }
     handleOptionChange(event){
-        this.setState({option: event.value});
+        this.setState({option: event.value,responseFlag : false });
+        
     }
     handleChange(event) {
         const name = event.target.name;
@@ -39,14 +42,35 @@ class App extends React.Component {
         const moon = createMoon();
         const distance = await moon.getDistanceToEarth();
         const delta = await moon.getAngularDiameter();
+        var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
 
-      alert('distance is : ' + distance + "\n"+
-      'delta is : ' + delta
-      );
       event.preventDefault();
-      this.setState({responseFlag: true});
+      this.setState({responseFlag: true,
+        moonInfo : _moonInfo});
     }
-    
+ 
+    async gpsDidMount() {
+        const moon = createMoon();
+        const distance = await moon.getDistanceToEarth();
+        const delta = await moon.getAngularDiameter();
+        var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
+
+        var _longitude;
+        var _latitude;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            _longitude =position.coords.longitude;
+            _latitude = position.coords.latitude;
+            console.log(_longitude,_latitude)
+ 
+          });
+        }
+       this.setState({
+                longitude : _longitude,
+                latitude : _latitude,
+                moonInfo : _moonInfo,
+                responseFlag : true });
+      }
     render() {
         let inputOptions = [
             {value:1 , label: "GPS"},
@@ -106,30 +130,20 @@ class App extends React.Component {
                         </Row>
                     </Form>
                 </Col>
-                : null 
-            }
+                : null }
                 { this.state.option == 1 ? 
-       
-                <Col md = {12}
+                    <Col md = {12}
                              style={{
                                 height: '35px',
                                 display: "flex",
                                 justifyContent: "center",}}
                                 >
-                  <p>
-                      GPS option
-                      </p>  
+                     <div >
+                        <button onClick={this.gpsDidMount}>Get Location</button>
+                    </div>
                 </Col>
-                         : null 
-                        }
-               
+                         : null}
             </Row>
-            
-            
-            
-            
-            
-            
             <Row
                 style={{
                     height: '35px',
@@ -138,15 +152,21 @@ class App extends React.Component {
                     alignItems: "center",
                 }}>
                 
-                { this.state.responseFlag ? 
-                    <p>
-                        Latitude is : {this.state.latitude}  Longitude is :  {this.state.longitude}  
-                    </p> 
-                // <Wrapper apiKey={"AIzaSyAvs-JNQhhyMi38iNEmRe45ehldcnSNce8"}>
-                //     <Map center={center} zoom={zoom}>
-                //              <Marker position={position} />
-                //     </Map>
-                // </Wrapper>
+                { this.state.responseFlag == true ? 
+                    <div style={{
+                        height: '35px', 
+                        justifyContent: "center", 
+                    }}>
+                        <p>
+                            Latitude is : {this.state.latitude} 
+                        </p>
+                        <p>
+                            Longitude is :  {this.state.longitude}  
+                        </p> 
+                        <p>
+                            Moon position is :  {this.state.moonInfo}  
+                        </p> 
+                    </div>
                 : null 
                 }
             </Row>
