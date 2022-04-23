@@ -1,60 +1,75 @@
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import {angleCalc} from 'astronomy-bundle/utils';
+import {createMoon} from 'astronomy-bundle/moon';
+
+
 import ReactDOM from 'react-dom/client';
+import { Form, Button, FormGroup, FormControl, ControlLabel, Row } from "react-bootstrap";
 
-let longitude = 0
-let latitude = 0
+class App extends React.Component {
+    
+    constructor(props) {
+      super(props);
+      this.state = {
+        longitude: "",
+        latitude: ""
+        };
+  
+      this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    handleChange(event) {
+        const name = event.target.name;
+        const value = event.target.value;
+        if(name == "longitude")
+            this.setState({longitude: value});
+        if(name == "latitude")
+            this.setState({latitude: value});
+    }
+   
+    async handleSubmit(event) {
+        const moon = createMoon();
+        const distance = await moon.getDistanceToEarth();
+        const delta = await moon.getAngularDiameter();
 
-function handleSubmit(event) {
-    console.log(this.latitude, this.longitude)
-    console.log(event)
-    event.preventDefault()
-}
+      alert('distance is : ' + distance + "\n"+
+      'delta is : ' + delta
+      );
 
-function handleLatChange(event) {
-    latitude = event.target.value
-}
+      event.preventDefault();
+    }
+  
+    render() {
 
-function handleLonChange(event){
-    longitude =  event.target.value
-}
-
-const form = <form onSubmit={handleSubmit}>
-    <label>Latitude: <textarea value={latitude} onChange={handleLatChange}> </textarea></label>
-    <label>Longitude: <textarea value={longitude} onChange={handleLonChange}> </textarea></label>
-    <input type="submit" value="Submit"/>
-</form>
-
-function componentDidMount() {
-    navigator.geolocation.getCurrentPosition(function (position){
-        console.log("Latitude is :", position.coords.latitude);
-        console.log("Longitude is :", position.coords.longitude);
-    }, function (){
-        let root = ReactDOM.createRoot(document.getElementById("root"))
-        root.render(form, document.getElementById("form"))
-    });
-}
-
-function App() {
-    componentDidMount()
+      
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
-        </div>
-    );
-}
+        <Form onSubmit={this.handleSubmit}>
+          <Row>
+            Longitude:
+            <input 
+            type="text" 
+            name = "longitude" 
+            value={this.state.longitude} 
+            onChange={this.handleChange} />
+            </Row>
+         <Row>
+            Latitude:
+            <input 
+            type="text" 
+            name = "latitude" 
+            value={this.state.latitude} 
+            onChange={this.handleChange} />
+          </Row>
+          <Row>
+            <input type="submit" value="Submit" />
+          </Row>
 
-export default App;
+           
+        </Form>
+           
+      );
+    }
+  }
+
+  export default App;
