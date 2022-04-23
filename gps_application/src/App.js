@@ -13,7 +13,8 @@ class App extends React.Component {
       super(props);
       this.state = {
         longitude: "",
-        latitude: ""
+        latitude: "",
+        responseFlag : false,
         };
   
       this.handleChange = this.handleChange.bind(this);
@@ -23,9 +24,9 @@ class App extends React.Component {
         const name = event.target.name;
         const value = event.target.value;
         if(name == "longitude")
-            this.setState({longitude: value});
+            this.setState({longitude: value,responseFlag: false});
         if(name == "latitude")
-            this.setState({latitude: value});
+            this.setState({latitude: value,responseFlag: false});
     }
    
     async handleSubmit(event) {
@@ -36,37 +37,80 @@ class App extends React.Component {
       alert('distance is : ' + distance + "\n"+
       'delta is : ' + delta
       );
-
       event.preventDefault();
+      this.setState({responseFlag: true});
     }
   
     render() {
-
-      
+     
     return (
-        <Form onSubmit={this.handleSubmit}>
-          <Row>
-            Longitude:
-            <input 
-            type="text" 
-            name = "longitude" 
-            value={this.state.longitude} 
-            onChange={this.handleChange} />
+        <div 
+        style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+            <Row>
+                <Form onSubmit={this.handleSubmit}>
+                    <Row
+                    style={{
+                        height: '35px',
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        Longitude:
+                        <input 
+                        type="text" 
+                        name = "longitude" 
+                        value={this.state.longitude} 
+                        onChange={this.handleChange} />
+                        </Row>
+                    <Row
+                        style={{
+                            height: '35px',
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}>
+                        Latitude:
+                        <input 
+                        type="text" 
+                        name = "latitude" 
+                        value={this.state.latitude} 
+                        onChange={this.handleChange} />
+                    </Row>
+                    <Row
+                        style={{
+                            height: '35px',
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}>
+                        <input type="submit" value="Submit" />
+                    </Row>
+                </Form>
             </Row>
-         <Row>
-            Latitude:
-            <input 
-            type="text" 
-            name = "latitude" 
-            value={this.state.latitude} 
-            onChange={this.handleChange} />
-          </Row>
-          <Row>
-            <input type="submit" value="Submit" />
-          </Row>
-
-           
-        </Form>
+            
+            <Row
+                style={{
+                    height: '35px',
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
+                
+                { this.state.responseFlag ? 
+        
+                    <p>
+                        Latitude is : {this.state.latitude}  Longitude is :  {this.state.longitude}  
+                    </p> 
+                
+                : null 
+                }
+            </Row>
+           </div>
            
       );
     }
