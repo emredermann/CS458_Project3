@@ -23,9 +23,15 @@ class App extends React.Component {
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
       this.handleOptionChange = this.handleOptionChange.bind(this);
-      this.gpsDidMount = this.gpsDidMount.bind(this);
+      this.gpsDidMount = this.gpsDidMount.bind(this); 
+      this.showPosition = this.showPosition.bind(this); 
+    
+    //   this.latitudeSetter = this.latitudeSetter.bind(this);
+    //   this.longitudeSetter = this.longitudeSetter.bind(this);
+
     }
     handleOptionChange(event){
+        this.setState({longitude: "",latitude : ""});
         this.setState({option: event.value,responseFlag : false });
         
     }
@@ -48,7 +54,18 @@ class App extends React.Component {
       this.setState({responseFlag: true,
         moonInfo : _moonInfo});
     }
- 
+    
+
+    showPosition(position) {
+        var _longitude;
+        var _latitude;
+        _longitude = position.coords.longitude;
+        _latitude = position.coords.latitude;
+        this.setState({
+            longitude : _longitude,
+            latitude : _latitude });
+      }
+
     async gpsDidMount() {
         const moon = createMoon();
         const distance = await moon.getDistanceToEarth();
@@ -58,16 +75,9 @@ class App extends React.Component {
         var _longitude;
         var _latitude;
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            _longitude =position.coords.longitude;
-            _latitude = position.coords.latitude;
-            console.log(_longitude,_latitude)
- 
-          });
+          navigator.geolocation.getCurrentPosition(this.showPosition) ;
         }
        this.setState({
-                longitude : _longitude,
-                latitude : _latitude,
                 moonInfo : _moonInfo,
                 responseFlag : true });
       }
