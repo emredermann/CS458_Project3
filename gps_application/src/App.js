@@ -3,7 +3,7 @@ import React from 'react';
 import {angleCalc} from 'astronomy-bundle/utils';
 import {createMoon} from 'astronomy-bundle/moon';
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
-
+import Geocode from "react-geocode";
 import Select from 'react-select';
 import ReactDOM from 'react-dom/client';
 import { Form, Button, FormGroup, FormControl, ControlLabel, Row, Col } from "react-bootstrap";
@@ -16,6 +16,7 @@ class App extends React.Component {
         longitude: "",
         latitude: "",
         moonInfo : "",
+        countryText : "",
         responseFlag : false,
         input_option : 0
         };
@@ -49,13 +50,24 @@ class App extends React.Component {
         const distance = await moon.getDistanceToEarth();
         const delta = await moon.getAngularDiameter();
         var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
+        var _countryText;
+        Geocode.fromLatLng(this.state.latitude, this.state.longitude).then(
+            (response) => {
+              const address = response.results[0].formatted_address;
+              console.log(address);
+              _countryText = address;
+            },
+            (error) => {
+              console.error(error);
+            }
+          );
 
       event.preventDefault();
       this.setState({responseFlag: true,
-        moonInfo : _moonInfo});
+        moonInfo : _moonInfo,
+        countryText : _countryText});
     }
     
-
     showPosition(position) {
         var _longitude;
         var _latitude;
@@ -82,6 +94,10 @@ class App extends React.Component {
                 responseFlag : true });
       }
     render() {
+        Geocode.setApiKey("AIzaSyAvs-JNQhhyMi38iNEmRe45ehldcnSNce8");
+        Geocode.setLanguage("en");
+        Geocode.setLocationType("ROOFTOP");
+       
         let inputOptions = [
             {value:1 , label: "GPS"},
             {value:2 , label: "Manual"}
@@ -174,7 +190,7 @@ class App extends React.Component {
                             Longitude is :  {this.state.longitude}  
                         </p> 
                         <p>
-                            Moon position is :  {this.state.moonInfo}  
+                            Location is  :  {this.state.countryText}  
                         </p> 
                     </div>
                 : null 
