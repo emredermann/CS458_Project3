@@ -13,13 +13,14 @@ class App extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        longitude: "",
-        latitude: "",
+        longitude: 0.0,
+        latitude: 0.0,
         moonInfo : "",
-        countryText : "",
+        countryText : "Not in a country",
         responseFlag : false,
         input_option : 0,
         distanceNorthPole : 0,
+        totalReactPackages : "",
         };
   
       this.handleChange = this.handleChange.bind(this);
@@ -33,11 +34,13 @@ class App extends React.Component {
     //   this.longitudeSetter = this.longitudeSetter.bind(this);
 
     }
+
     handleOptionChange(event){
         this.setState({longitude: "",latitude : ""});
         this.setState({option: event.value,responseFlag : false });
         
     }
+
     handleChange(event) {
         const name = event.target.name;
         const value = event.target.value;
@@ -46,6 +49,28 @@ class App extends React.Component {
         if(name == "latitude")
             this.setState({latitude: value,responseFlag: false});
     }
+
+    country(lat, lon){
+        fetch("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&result_type=country&key=AIzaSyDK_V9tKd2J66z2-T-AJzy6OLh0X8AM8Oc") .then((response) => {
+            response.json().then((data) => {
+                if(data.status === "ZERO_RESULTS"){
+                    this.setState({
+                        "countryText" : "in the Sea probably."
+                    });
+                    return data;
+                }
+                console.log(data);
+                let country = data.results[0].formatted_address;
+                this.setState({
+                    "countryText" : country,
+                })
+                return data;
+            }).catch((err) => {
+                console.log(err);
+            })
+        });
+    }
+
     distance(lat1, lon1, lat2, lon2, unit) {
         var radlat1 = Math.PI * lat1/180
         var radlat2 = Math.PI * lat2/180
@@ -59,36 +84,22 @@ class App extends React.Component {
         dist = dist * 60 * 1.1515
         if (unit=="K") { dist = dist * 1.609344 }
         if (unit=="N") { dist = dist * 0.8684 }
-        return dist
+        return dist.toFixed(2)
     }
 
     async handleSubmit(event) {
-        Geocode.setApiKey("AIzaSyAvs-JNQhhyMi38iNEmRe45ehldcnSNce8");
-        Geocode.setLanguage("en");
-        Geocode.setLocationType("ROOFTOP");
         const moon = createMoon();
         const distance = await moon.getDistanceToEarth();
         const delta = await moon.getAngularDiameter();
         var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
-        var _countryText;
        var _distanceNorthPole = this.distance(this.state.latitude,this.state.longitude,90,0);
 
-        Geocode.fromLatLng(this.state.latitude, this.state.longitude).then(
-            (response) => {
-              const address = response.results[0].formatted_address;
-              console.log(address);
-              _countryText = address;
-            },
-            (error) => {
-              console.error(error);
-            }
-          );
+       this.country(this.state.latitude, this.state.longitude)
 
       event.preventDefault();
       this.setState({responseFlag: true,
         distanceNorthPole : _distanceNorthPole,
-        moonInfo : _moonInfo,
-        countryText : _countryText});
+        moonInfo : _moonInfo});
     }
     
     showPosition(position) {
@@ -96,6 +107,7 @@ class App extends React.Component {
         var _latitude;
         _longitude = position.coords.longitude;
         _latitude = position.coords.latitude;
+        this.country(_latitude, _longitude)
         this.setState({
             longitude : _longitude,
             latitude : _latitude });
@@ -109,10 +121,12 @@ class App extends React.Component {
         var _longitude;
         var _latitude;
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(this.showPosition) ;
+          navigator.geolocation.getCurrentPosition(this.showPosition);
         }
-       var _distanceNorthPole = this.distance(this.state.latitude,this.state.longitude,90,0);
-       this.setState({
+       var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
+
+
+        this.setState({
                 moonInfo : _moonInfo,
                 responseFlag : true,
                 distanceNorthPole : _distanceNorthPole
@@ -149,15 +163,6 @@ class App extends React.Component {
                         }}>
                     <Form onSubmit={this.handleSubmit}>
                         <Row
-                        >
-                            Longitude:
-                            <input 
-                            type="text" 
-                            name = "longitude" 
-                            value={this.state.longitude} 
-                            onChange={this.handleChange} />
-                            </Row>
-                        <Row
                              >
                             Latitude:
                             <input 
@@ -165,6 +170,15 @@ class App extends React.Component {
                             name = "latitude" 
                             value={this.state.latitude} 
                             onChange={this.handleChange} />
+                        </Row>
+                        <Row
+                        >
+                            Longitude:
+                            <input
+                                type="text"
+                                name = "longitude"
+                                value={this.state.longitude}
+                                onChange={this.handleChange} />
                         </Row>
                         <Row
                             style={{
@@ -211,10 +225,13 @@ class App extends React.Component {
                             Longitude is :  {this.state.longitude}  
                         </p> 
                         <p>
-                            Location is  :  {this.state.countryText}  
-                        </p> 
+                            Location is  :  {this.state.countryText}
+                        </p>
                         <p>
-                            Distance to NorthPole is  :  {this.state.distanceNorthPole} km.  
+                            From our point to the Moon the {this.state.moonInfo} km.
+                        </p>
+                        <p>
+                            Distance to NorthPole is  :  {this.state.distanceNorthPole} km.
                         </p> 
                     </div>
                 : null 
