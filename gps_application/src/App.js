@@ -37,18 +37,17 @@ class App extends React.Component {
     }
 
     handleChange(event) {
-
         const name = event.target.name;
         const value = event.target.value;
         if(name == "longitude"){            
-            if( value >= -180 && value <= 180){
+            if( value >= -180 && value <= 180 || value == '-'){
             this.setState({longitude: value,responseFlag: false,message_area:""});
           }else{
             this.setState({message_area: "Longtitude must be in 180 - 0 "});
           }
         }
         if(name == "latitude"){
-          if( value >= -90 && value <= 90 ){
+          if( value >= -90 && value <= 90 || value == '-'){
             this.setState({latitude: value,responseFlag: false,message_area:""});
           }else{
             this.setState({message_area: "Latitude must be in 90  - 0 "});
