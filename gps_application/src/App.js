@@ -20,6 +20,7 @@ class App extends React.Component {
         input_option : 0,
         distanceNorthPole : 0,
         totalReactPackages : "",
+        message_area : ""
         };
   
       this.handleChange = this.handleChange.bind(this);
@@ -31,26 +32,28 @@ class App extends React.Component {
     }
 
     handleOptionChange(event){
-        this.setState({longitude: "",latitude : ""});
+        this.setState({longitude: "",latitude : "",message_area : ""});
         this.setState({option: event.value,responseFlag : false });
     }
 
     handleChange(event) {
+
         const name = event.target.name;
         const value = event.target.value;
         if(name == "longitude"){            
-            if(value < 90 && value >= 0){
-            this.setState({longitude: value,responseFlag: false});
+            if( value >= -180 && value <= 180){
+            this.setState({longitude: value,responseFlag: false,message_area:""});
           }else{
-            alert("Longtitude must be in 90  - 0 ")
+            this.setState({message_area: "Longtitude must be in 180 - 0 "});
           }
         }
         if(name == "latitude"){
-          if(value < 90 && value >= 0){
-            this.setState({latitude: value,responseFlag: false});
+          if( value >= -90 && value <= 90 ){
+            this.setState({latitude: value,responseFlag: false,message_area:""});
           }else{
-            alert("Latitude must be in 180  - 0 ")
+            this.setState({message_area: "Latitude must be in 90  - 0 "});
           }
+          console.log(value)
         }
     }
 
@@ -164,8 +167,7 @@ class App extends React.Component {
                             justifyContent: "space-around",
                         }}>
                     <Form onSubmit={this.handleSubmit}>
-                        <Row
-                             >
+                        <Row>
                             Latitude:
                             <input 
                             type="text" 
@@ -173,8 +175,7 @@ class App extends React.Component {
                             value={this.state.latitude} 
                             onChange={this.handleChange} />
                         </Row>
-                        <Row
-                        >
+                        <Row>
                             Longitude:
                             <input
                                 type="text"
@@ -238,6 +239,9 @@ class App extends React.Component {
                     </div>
                 : null 
                 }
+                    <p>
+                           {this.state.message_area} 
+                    </p> 
             </Row>
            </div>
            
