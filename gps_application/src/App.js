@@ -124,7 +124,7 @@ class App extends React.Component {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(this.showPosition);
         }else{
-          alert("GPS could not connected !!")
+          alert("GPS is not active !!")
         }
        var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
 
