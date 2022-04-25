@@ -110,6 +110,7 @@ class App extends React.Component {
         _longitude = position.coords.longitude;
         _latitude = position.coords.latitude;
         this.country(_latitude, _longitude)
+        console.log(_latitude,_longitude);
         this.setState({
             longitude : _longitude,
             latitude : _latitude });
@@ -120,16 +121,14 @@ class App extends React.Component {
         const distance = await moon.getDistanceToEarth();
         const delta = await moon.getAngularDiameter();
         var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
-        var _longitude;
-        var _latitude;
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(this.showPosition);
+        }else{
+          alert("GPS could not connected !!")
         }
        var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
 
         this.setState({
-                latitude : _latitude,
-                longitude : _longitude,
                 moonInfo : _moonInfo,
                 responseFlag : true,
                 distanceNorthPole : _distanceNorthPole
