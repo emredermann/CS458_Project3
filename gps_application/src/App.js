@@ -1,6 +1,5 @@
 import './App.css';
 import React from 'react';
-import {angleCalc} from 'astronomy-bundle/utils';
 import {createMoon} from 'astronomy-bundle/moon';
 import { Wrapper, Status } from "@googlemaps/react-wrapper";
 import Geocode from "react-geocode";
@@ -29,25 +28,30 @@ class App extends React.Component {
       this.gpsDidMount = this.gpsDidMount.bind(this); 
       this.showPosition = this.showPosition.bind(this); 
       this.distance = this.distance.bind(this); 
-    
-    //   this.latitudeSetter = this.latitudeSetter.bind(this);
-    //   this.longitudeSetter = this.longitudeSetter.bind(this);
-
     }
 
     handleOptionChange(event){
         this.setState({longitude: "",latitude : ""});
         this.setState({option: event.value,responseFlag : false });
-        
     }
 
     handleChange(event) {
         const name = event.target.name;
         const value = event.target.value;
-        if(name == "longitude")
+        if(name == "longitude"){            
+            if(value < 90 && value >= 0){
             this.setState({longitude: value,responseFlag: false});
-        if(name == "latitude")
+          }else{
+            alert("Longtitude must be in 90  - 0 ")
+          }
+        }
+        if(name == "latitude"){
+          if(value < 90 && value >= 0){
             this.setState({latitude: value,responseFlag: false});
+          }else{
+            alert("Latitude must be in 180  - 0 ")
+          }
+        }
     }
 
     country(lat, lon){
@@ -55,14 +59,14 @@ class App extends React.Component {
             response.json().then((data) => {
                 if(data.status === "ZERO_RESULTS"){
                     this.setState({
-                        "countryText" : "in the Sea probably."
+                        countryText : "in the Sea probably."
                     });
                     return data;
                 }
                 console.log(data);
                 let country = data.results[0].formatted_address;
                 this.setState({
-                    "countryText" : country,
+                    countryText : country,
                 })
                 return data;
             }).catch((err) => {
@@ -88,14 +92,12 @@ class App extends React.Component {
     }
 
     async handleSubmit(event) {
-        const moon = createMoon();
-        const distance = await moon.getDistanceToEarth();
-        const delta = await moon.getAngularDiameter();
-        var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
-       var _distanceNorthPole = this.distance(this.state.latitude,this.state.longitude,90,0);
-
-       this.country(this.state.latitude, this.state.longitude)
-
+      const moon = createMoon();
+      const distance = await moon.getDistanceToEarth();
+      const delta = await moon.getAngularDiameter();
+      var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
+      var _distanceNorthPole = this.distance(this.state.latitude,this.state.longitude,90,0);
+      this.country(this.state.latitude, this.state.longitude);
       event.preventDefault();
       this.setState({responseFlag: true,
         distanceNorthPole : _distanceNorthPole,
@@ -125,8 +127,9 @@ class App extends React.Component {
         }
        var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
 
-
         this.setState({
+                latitude : _latitude,
+                longitude : _longitude,
                 moonInfo : _moonInfo,
                 responseFlag : true,
                 distanceNorthPole : _distanceNorthPole
