@@ -43,14 +43,14 @@ class App extends React.Component {
             if( value >= -180 && value <= 180 || value == '-'){
             this.setState({longitude: value,responseFlag: false,message_area:""});
           }else{
-            this.setState({message_area: "Longtitude must be in 180 - 0 "});
+            this.setState({message_area: "Longtitude must be in 180 --- -180 "});
           }
         }
         if(name == "latitude"){
           if( value >= -90 && value <= 90 || value == '-'){
             this.setState({latitude: value,responseFlag: false,message_area:""});
           }else{
-            this.setState({message_area: "Latitude must be in 90  - 0 "});
+            this.setState({message_area: "Latitude must be in 90  --- -90 "});
           }
           console.log(value)
         }
@@ -124,16 +124,17 @@ class App extends React.Component {
         const delta = await moon.getAngularDiameter();
         var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(this.showPosition);
+            navigator.geolocation.getCurrentPosition(this.showPosition);
+            this.setState({message_area: ""});
         }else{
-          alert("GPS is not active !!")
+            this.setState({message_area: "GPS is not active !!"});
         }
        var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
 
         this.setState({
                 moonInfo : _moonInfo,
                 responseFlag : true,
-                distanceNorthPole : _distanceNorthPole
+                distanceNorthPole : _distanceNorthPole,
             });
       }
     render() {      
