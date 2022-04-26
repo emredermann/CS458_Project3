@@ -1,12 +1,43 @@
-# CS458_Project3
+# CS458 - PROJECT 3
+A web application to enter location data or get location data from geolocation services and return respective information on that location.
 
-### 1. With the help of Test Driven Development (TDD)
-Develop a responsive page (that can run on laptops, mobile devices etc., no mobile native code required) for the following tasks:
-#### a) You enter your coordinates of your location and it shows your country (via Google Map API etc.).
-#### b) It gets GPS coordinates of your device automatically and it shows your distance to the Geographic North Pole (Terrestrial North Pole).
-#### c) You enter your coordinates or it gets GPS of your device, then it shows your distance to the Moon’s core (You should also take the changing position of Moon into account).
-#### d) For each one (a,b, and c parts) write all the test cases.
-#### e) Write test code (red-line) and write the main code to pass just the red-line.
-#### f) Attach your code and UML diagrams (Activity, State, Use-case, Sequence, and Class)
-### 2. Refactor your code and explain what you have done.
-### 3. Evaluate your TDD experience in terms of development velocity and code quality.
+## Table of contents
+* [General info](#general-info)
+* [Group Members](#group-members)
+* [Introduction](#introduction)
+* [Building](#Building)
+
+## General Info
+This repository is for the CS458 course Project 3.
+
+## Group Members
+
+| Member | Student No:|
+| ----------- | ----------- |
+|Emre Derman	| 21703508 |
+|Cankat Anday Kadim | 21802988|
+
+## Introduction
+This app is just a website that calculates the country the location is in, the distance to the North Pole and the distance to the core of the moon from a given location.
+
+## Building
+
+To build this project you will need React. You can get it at:
+
+    https://reactjs.org/docs/create-a-new-react-app.html
+
+To launch the project first you need to install the respective React libraries:
+
+    npm -install
+    
+To build the application run the command:
+
+    npm start
+
+To run the tests all you have to do is navigate to tests folder and run the python file in your respective OS.
+
+    py .\main.py
+
+For the tests to properly run you need to have Google Chrome installed or alternatively you can download the correct Selenium WebDriver from:
+
+    https://www.selenium.dev/downloads/
