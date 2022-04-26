@@ -12,8 +12,8 @@ class App extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        longitude: 0.0,
-        latitude: 0.0,
+        longitude: "",
+        latitude: "",
         moonInfo : "",
         countryText : "Not in a country",
         responseFlag : false,
@@ -41,18 +41,18 @@ class App extends React.Component {
     handleChange(event) {
         const name = event.target.name;
         const value = event.target.value;
-        if(name == "longitude"){            
-            if( value >= -180 && value <= 180 || value == '-'){
+        if(name === "longitude"){
+            if( value >= -180 && value <= 180 || value === '-'){
             this.setState({longitude: value,responseFlag: false,message_area:""});
           }else{
-            this.setState({message_area: "Longtitude must be in 180 --- -180 "});
+            this.setState({message_area: "Longitude must be between 180 and -180"});
           }
         }
-        if(name == "latitude"){
-          if( value >= -90 && value <= 90 || value == '-'){
-            this.setState({latitude: value,responseFlag: false,message_area:""});
+        if(name === "latitude"){
+          if( value >= -90 && value <= 90 || value === '-'){
+            this.setState({latitude: value, responseFlag: false,message_area:""});
           }else{
-            this.setState({message_area: "Latitude must be in 90  --- -90 "});
+            this.setState({message_area: "Latitude must be between 90 and -90"});
           }
           console.log(value)
         }
@@ -94,16 +94,23 @@ class App extends React.Component {
     }
 
     async handleSubmit(event) {
-      const moon = createMoon();
-      const distance = await moon.getDistanceToEarth();
-      const delta = await moon.getAngularDiameter();
-      var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
-      var _distanceNorthPole = this.distance(this.state.latitude,this.state.longitude,90,0);
-      this.country(this.state.latitude, this.state.longitude);
-      event.preventDefault();
-      this.setState({responseFlag: true,
-        distanceNorthPole : _distanceNorthPole,
-        moonInfo : _moonInfo});
+    if(this.state.latitude === "" || this.state.longitude === ""){
+        this.setState({latitude : "", longitude : "", message_area: "Input can't be empty"})
+        event.preventDefault()
+    }else{
+            const moon = createMoon();
+            const distance = await moon.getDistanceToEarth();
+            const delta = await moon.getAngularDiameter();
+            var _moonInfo = 'distance is : ' + distance + "\n" + 'delta is : ' + delta;
+            var _distanceNorthPole = this.distance(this.state.latitude, this.state.longitude, 90, 0);
+            this.country(this.state.latitude, this.state.longitude);
+            event.preventDefault();
+            this.setState({
+                responseFlag: true,
+                distanceNorthPole: _distanceNorthPole,
+                moonInfo: _moonInfo
+            });
+        }
     }
     
     showPosition(position) {
@@ -114,7 +121,7 @@ class App extends React.Component {
         this.country(_latitude, _longitude)
         console.log(_latitude,_longitude);
         this.setState({
-            message_area: "GPS activated !!",gpsFlag : false,
+            message_area: "",gpsFlag : false,
             longitude : _longitude,
             latitude : _latitude });
       }
@@ -132,7 +139,7 @@ class App extends React.Component {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(this.showPosition);
             navigator.geolocation.watchPosition(this.showPosition,this.showError);
-            this.setState({message_area: "",gpsFlag : false});
+            this.setState({message_area: "", gpsFlag : false});
         }else{
             this.setState({message_area: "GPS is not active !!", gpsFlag : true});
         }
@@ -159,7 +166,7 @@ class App extends React.Component {
             <Row>
                 <Row>
                     <p> Please enter your input choice .... </p>
-                <Select
+                <Select id="input_choice_select"
                         className="basic-single"
                         classNamePrefix="select"
                         onChange={this.handleOptionChange}
@@ -176,7 +183,7 @@ class App extends React.Component {
                     <Form onSubmit={this.handleSubmit}>
                         <Row>
                             Latitude:
-                            <input 
+                            <input id="latitude_input"
                             type="text" 
                             name = "latitude" 
                             value={this.state.latitude} 
@@ -184,7 +191,7 @@ class App extends React.Component {
                         </Row>
                         <Row>
                             Longitude:
-                            <input
+                            <input id="longitude_input"
                                 type="text"
                                 name = "longitude"
                                 value={this.state.longitude}
@@ -197,7 +204,7 @@ class App extends React.Component {
                                 justifyContent: "center",
                                 alignItems: "center",
                             }}>
-                            <input type="submit" value="Submit" />
+                            <input id="manual_submit" type="submit" value="Submit" />
                         </Row>
                     </Form>
                 </Col>
@@ -210,7 +217,7 @@ class App extends React.Component {
                                 justifyContent: "center",}}
                                 >
                      <div >
-                        <button onClick={this.gpsDidMount}>Get Location</button>
+                        <button id="auto_submit" onClick={this.gpsDidMount}>Get Location</button>
                     </div>
                 </Col>
                          : null}
@@ -228,27 +235,26 @@ class App extends React.Component {
                         height: '35px', 
                         justifyContent: "center", 
                     }}>
-                    { this.state.gpsFlag == true ?  
+                    { this.state.gpsFlag === true ?
                         <div>
                         <p>
-                           {this.state.message_area} 
-                        </p> 
+                        </p>
                         </div>
                         :
                         <div>
-                        <p>
+                        <p id="lat_text">
                             Latitude is : {this.state.latitude} 
                         </p>
-                        <p>
+                        <p id="lng_text">
                             Longitude is :  {this.state.longitude}  
                         </p> 
-                        <p>
+                        <p id="loc_text">
                             Location is  :  {this.state.countryText}
                         </p>
-                        <p>
+                        <p id="moon_text">
                             From our point to the Moon the {this.state.moonInfo} km.
                         </p>
-                        <p>
+                        <p id="pole_text">
                             Distance to NorthPole is  :  {this.state.distanceNorthPole} km.
                         </p> 
                         </div>
@@ -256,7 +262,9 @@ class App extends React.Component {
                     </div>
                 : null 
                 }
-
+                    <p id="error_msg">
+                           {this.state.message_area}
+                    </p>
             </Row>
            </div>
            
