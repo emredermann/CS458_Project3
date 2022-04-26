@@ -17,6 +17,7 @@ class App extends React.Component {
         moonInfo : "",
         countryText : "Not in a country",
         responseFlag : false,
+        gpsFlag : false,
         input_option : 0,
         distanceNorthPole : 0,
         totalReactPackages : "",
@@ -28,6 +29,7 @@ class App extends React.Component {
       this.handleOptionChange = this.handleOptionChange.bind(this);
       this.gpsDidMount = this.gpsDidMount.bind(this); 
       this.showPosition = this.showPosition.bind(this); 
+      this.showError = this.showError.bind(this); 
       this.distance = this.distance.bind(this); 
     }
 
@@ -80,8 +82,6 @@ class App extends React.Component {
     distance(lat1, lon1, lat2, lon2, unit) {
         var radlat1 = Math.PI * lat1/180
         var radlat2 = Math.PI * lat2/180
-        var radlon1 = Math.PI * lon1/180
-        var radlon2 = Math.PI * lon2/180
         var theta = lon1-lon2
         var radtheta = Math.PI * theta/180
         var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
@@ -114,20 +114,27 @@ class App extends React.Component {
         this.country(_latitude, _longitude)
         console.log(_latitude,_longitude);
         this.setState({
+            message_area: "GPS activated !!",gpsFlag : false,
             longitude : _longitude,
             latitude : _latitude });
       }
+      showError(error) {
+        this.setState({message_area: "GPS is not active !!",gpsFlag : true});
+      }
 
+      
     async gpsDidMount() {
         const moon = createMoon();
         const distance = await moon.getDistanceToEarth();
-        const delta = await moon.getAngularDiameter();
-        var _moonInfo = 'distance is : ' + distance + "\n"+ 'delta is : ' + delta;
+        // const delta = await moon.getAngularDiameter();
+        var _moonInfo = 'distance is : ' + distance + "\n";
+        console.log(navigator.geolocation == "object")
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(this.showPosition);
-            this.setState({message_area: ""});
+            navigator.geolocation.watchPosition(this.showPosition,this.showError);
+            this.setState({message_area: "",gpsFlag : false});
         }else{
-            this.setState({message_area: "GPS is not active !!"});
+            this.setState({message_area: "GPS is not active !!", gpsFlag : true});
         }
        var _distanceNorthPole = this.distance(parseFloat(this.state.latitude), parseFloat(this.state.longitude),90,0);
 
@@ -221,6 +228,14 @@ class App extends React.Component {
                         height: '35px', 
                         justifyContent: "center", 
                     }}>
+                    { this.state.gpsFlag == true ?  
+                        <div>
+                        <p>
+                           {this.state.message_area} 
+                        </p> 
+                        </div>
+                        :
+                        <div>
                         <p>
                             Latitude is : {this.state.latitude} 
                         </p>
@@ -236,12 +251,12 @@ class App extends React.Component {
                         <p>
                             Distance to NorthPole is  :  {this.state.distanceNorthPole} km.
                         </p> 
+                        </div>
+                }
                     </div>
                 : null 
                 }
-                    <p>
-                           {this.state.message_area} 
-                    </p> 
+
             </Row>
            </div>
            
